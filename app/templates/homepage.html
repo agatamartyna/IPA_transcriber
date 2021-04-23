@@ -1,0 +1,46 @@
+<! DOCTYPE html>
+<html lang="pl">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>Fonemiczny transkryber</title>
+    <style>
+        table, th, tr, td {border: 1px solid black;}
+    </style>
+</head>
+
+<body>
+    <h1>Wybierz dialekt</h1>
+    <table>
+    <form action="/" method="POST">
+        <table>
+            <tr>
+                <td>Dialekt</td>
+                <td>Tekst</td>
+            </tr>
+            <tr>
+                <td>{{ form.dialect }}</td>
+                <td>{{ form.text }}</td>
+            </tr>
+        </table>
+        <input type="submit" value="transkrybuj">
+    </form>
+    </table>
+    <br>
+    <br>
+    <br>
+{% if data %}
+    <table>
+        <tr>
+            <td>Wybrany dialekt</td>
+            <td>Twój tekst</td>
+        </tr>
+        <tr>
+            <td>{{ data["dialect"] }}</td>
+            <td>{{ data["text"] }}</td>
+        </tr>
+    </table>
+{% endif %}
+</body>
+</html>
