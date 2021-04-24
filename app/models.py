@@ -373,12 +373,28 @@ def transcribe_text_Cracow(text):
         elif (
             (ph_words[i][-1]) in voi_dict_rev and
             (ph_words[i + 1][0] in vocs or
-             ph_words[i + 1][0] in voicing_dict or
+             ph_words[i + 1][0] in voicing_dict.values() or
              ph_words[i + 1][0] in ipa_vowels)
         ):
             ph_words[i] = (ph_words[i][:-1]) + (voi_dict_rev[(ph_words[i][-1])])
 
-    # pre-vocalic voicing and pre-voiced-obstruent voicing for obstruent clusters
+    # Regressive Final Devoicing before prepositions 'w' and 'z' standing before voiceless consonants
+    for i in range(len(ph_words) - 1):
+        if (
+                    (ph_words[i][-1] in voicing_dict.keys() or ph_words[i][-2:] in voicing_dict.keys()) and
+                    (len(ph_words[i + 1]) == 1 and ph_words[i + 1] in voicing_dict.keys()) and
+                    ph_words[i + 2] and
+                    ph_words[i + 2][0] in voicing_dict.values()
+        ):
+            if ph_words[i][-2:] in voicing_dict.keys():
+                ph_words[i] = ph_words[i][:-2] + voicing_dict[ph_words[i][-2:]]
+                ph_words[i + 1] = voicing_dict[ph_words[i + 1]]
+            elif ph_words[i][-1] in voicing_dict.keys():
+                ph_words[i] = ph_words[i][:-1] + voicing_dict[ph_words[i][-1]]
+                ph_words[i + 1] = voicing_dict[ph_words[i + 1]]
+
+
+    # Voice assimilation for final obstruent clusters
     for i in range(len(ph_words) - 1):
         if len(ph_words[i]) > 3:
             if ph_words[i][-2] in voi_dict_rev and ph_words[i][-1] in voicing_dict:
@@ -389,6 +405,8 @@ def transcribe_text_Cracow(text):
                 ph_words[i] = ph_words[i][:-4] + voi_dict_rev[ph_words[i][-4:-2]] + ph_words[i][-2:]
             elif ph_words[i][-3] in voi_dict_rev and ph_words[i][-2:] in voicing_dict:
                 ph_words[i] = ph_words[i][:-3] + voi_dict_rev[ph_words[i][-3]] + ph_words[i][-2:]
+
+
 
     # extract non-alphabetic substrings
     non_words = re.findall(r'[^a-ząćęłńóśźż]+', text)

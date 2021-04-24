@@ -11,26 +11,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="static/style_grid.css">
     <style>
-        .container {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        margin-right: 10;
-        margin-left:10;
-        }
-        .container label {
-        font-size: 20px;
-        }
-        .container p {
-        font-size: 20px;
-        }
-        .btn {
-        font-size: 20px;
-        }
+
     </style>
 </head>
 <body>
 
-<div id="carousel-example-generic" class="carousel slide" data-ride="carousel" style="margin-bottom: 40px;">
+<div id="carousel-example-generic" class="carousel slide" data-ride="carousel" style="margin-bottom: 20px; font-family: sans-serif;">
         <ol class="carousel-indicators">
             <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
             <li data-target="#carousel-example-generic" data-slide-to="1"></li>
@@ -42,7 +28,7 @@
                 <img class="img-responsive" style="width: 100%; height: 200px;"  src="static/pics/b_1.jpg">
                 <div class="carousel-caption" >
                     <h2>Witaj w aplikacji Konwerter IPA</h2>
-                    <p style="padding: 10px">Wpisz dowolny tekst w języku polskim, a otrzymasz jego transkrypcję fonemiczną.</p>
+                    <p style="padding: 10px;">Wpisz dowolny tekst w języku polskim, a otrzymasz jego transkrypcję fonemiczną.</p>
                 </div>
             </div>
             <div class="item">
@@ -80,28 +66,25 @@
     </div>
 
         <div class="container">
-        <h2 style="font-weight: bold;">Konwertuj tekst</h2>
-        </div
-
-        <div class="container">
-        <form method="POST" action="/">
-            <div class="container">
-            <label>Wybierz dialekt:</label>
-            <p> {{ form.dialect(class = "form-control", style="background-color: #e1f5fa; font-size:20px;") }}</p>
-            </div>
-            <div class="container">
-            <label>Wpisz tekst</label>
-            <p>{{ form.text(class = "form-control", rows='3',cols='150', style="background-color: #e1f5fa; font-size:20px;") }}</p>
-                </div>
-            <div class="container">
-            <p><button class="btn btn-primary">Konwertuj</button></p>
-                </div>
-            {% if res %}
-            <div class="container">
+        <h3 style="margin-bottom: 40px;">Konwertuj tekst</h3>
+            <form method="POST" action="/">
+                   <label>Wybierz dialekt:</label>
+                    <p style="width: 20%;"> {{ form.dialect(class = "form-control", style="background-color: #e1f5fa;") }}</p>
+       <div class="row">
+           <div class="col-lg-6">
+                    <label>Wpisz tekst</label>
+                    <p>{{ form.text(class = "form-control", rows='6',cols='60', placeholder="Twój tekst...", style="background-color: #e1f5fa;") }}</p>
+                    <p><button class="btn btn-primary">Konwertuj</button></p>
+               </form>
+           </div>
+            <div class="col-lg-6">
             <label>Transkrypcja</label>
-            <p class="thumbnail" style="background-color: #e1f5fa">{{ res }}</p>
+
+            <p class = "thumbnail" style="background-color: #e1f5fa">{% if res %}{{ res }}{% else %}<span style="color: #a9acb0">Tu pojawi się Twoja transkrypcja...<span>{% endif %}</p>
+
             </div>
-            {% endif %}
+           </div>
+            </div>
 
 <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
