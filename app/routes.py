@@ -5,6 +5,7 @@ from app.models_Cracow import transcribe_text_Cracow
 from app.models_Warsaw import transcribe_text_Warsaw
 
 
+
 @app.route('/', methods=["GET", "POST"])
 def index():
     form = DialectForm()
@@ -23,4 +24,5 @@ def index():
             return render_template("homepage_2.html", form=form, data=data, res=res)
 
     return render_template("homepage_2.html", form=form, res=res)
+
 

@@ -78,6 +78,8 @@ def transcribe_text_Warsaw(text):
                 ph_words[i] = ph_words[i][:-1] + voi_dict_rev[ph_words[i][-1]]
             ph_words[i + 1] = voi_dict_rev[ph_words[i + 1]]
 
+    # Regressive revoicing of 'w' and 'z' at the beginning f a phrase
+
 
     # extract non-alphabetic substrings
     non_words = re.findall(r'[^a-ząćęłńóśźż]+', text)
