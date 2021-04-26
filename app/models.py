@@ -86,7 +86,8 @@ ipa_dict = {
     'y': CLOSE_CENT,
     'z': VD_ALV_FRIC,
     'ż': VD_POSTALV_FRIC,
-    'ź': VD_PAL_FRIC
+    'ź': VD_PAL_FRIC,
+    'x': VS_VEL_STOP + VS_ALV_FRIC
 }
 
 # vowels
@@ -268,7 +269,7 @@ def transcribe(word):
                 ph_word = ph_word[:i + 1] + 'ɳ' + ph_word[i + 2:]
 
     #  notation: remove palatal approximant from sequences  PAL_APPROX + 'i' + VOWEL
-    for i in range(len(ph_word)-2):
+    for i in range(len(ph_word)-3):
         if (
                 ph_word[i] in pals and
                 ph_word[i + 1] == 'i' and
@@ -277,7 +278,7 @@ def transcribe(word):
             ph_word = ph_word[:i + 1] + ph_word[i + 2:]
 
     #  notation: turn 'i' into 'j' in sequences CONSONANT + 'i' + VOWEL
-    for i in range(len(ph_word)-2):
+    for i in range(len(ph_word)-3):
         if (
             ph_word[i] in non_pals and
             ph_word[i + 1] == 'i' and
@@ -292,11 +293,20 @@ def transcribe(word):
         elif ph_word[-1] == voiced:
             ph_word = ph_word[:-1] + voicing_dict[voiced]
 
-    # Final Devoicing Clusters
-    for voiced in [key for key in voicing_dict.keys()]:
-        if len(ph_word) > 2:
-            if ph_word[-2] == voiced and ph_word[-1] in voicing_dict.values():
-                ph_word = ph_word[:-2] + voicing_dict[voiced] + ph_word[-1]
+    # Final Devoicing for Pairs of Obstruent Clusters
+    # this empirically-based solution not working with final obstruent clusters longer than 2 items
+    # because there are none in Polish
+    for i in range(len(ph_word) - 1):
+        if ph_word[-2:] in voi_dict_rev:
+            if len(ph_word) >= 4 and ph_word[-4:-2] in voicing_dict:
+                ph_word = ph_word[:-4] + voicing_dict[ph_word[-4:-2]] + ph_word[-2:]
+            elif len(ph_word) >=3 and ph_word[-3] in voicing_dict:
+                ph_word = ph_word[:-3] + voicing_dict[ph_word[-3]] + ph_word[-2:]
+        elif  ph_word[-1] in voi_dict_rev:
+            if len(ph_word) >= 3 and ph_word[-3:-1] in voicing_dict:
+                ph_word = ph_word[:-3] + voicing_dict[ph_word[-3:-1]] + ph_word[-1]
+            elif len(ph_word) >=2 and ph_word[-2] in voicing_dict:
+                ph_word = ph_word[:-2] + voicing_dict[ph_word[-2]] + ph_word[-1]
 
 
     # Regressive Voicing
@@ -326,7 +336,7 @@ def transcribe(word):
 
     # Surface Palatalisation for CONS + 'j' + VOW
     i = 0
-    while i < len(ph_word)-1:
+    while i <= len(ph_word)-3:
         if (
                 ph_word[i] in non_pals and
                 ph_word[i + 1] == 'j' and
@@ -347,159 +357,3 @@ def transcribe(word):
 
     return ph_word
 
-def transcribe_text_Cracow(text):
-
-    # lowercase all letters
-    text = text.lower()
-
-    # extract alphabetic substrings
-    words = re.findall(r'[a-ząćęłńóśźż]+', text)
-
-    # phonemic transcription of words taken individually (regional processes not applied)
-    ph_words = []
-    if words:
-        for word in words:
-            ph_words.append(transcribe(word))
-
-    # pre-vocalic voicing and pre-voiced-obstruent voicing
-    for i in range(len(ph_words) - 1):
-        if (
-            ph_words[i][-2:] in voi_dict_rev and
-            (ph_words[i + 1][0] in vocs or
-             ph_words[i + 1][0] in voicing_dict or
-             ph_words[i + 1][0] in ipa_vowels)
-            ):
-            ph_words[i] = (ph_words[i][:-2]) + (voi_dict_rev[(ph_words[i][-2:])])
-        elif (
-            (ph_words[i][-1]) in voi_dict_rev and
-            (ph_words[i + 1][0] in vocs or
-             ph_words[i + 1][0] in voicing_dict.values() or
-             ph_words[i + 1][0] in ipa_vowels)
-        ):
-            ph_words[i] = (ph_words[i][:-1]) + (voi_dict_rev[(ph_words[i][-1])])
-
-    # Regressive Final Devoicing before prepositions 'w' and 'z' standing before voiceless consonants
-    for i in range(len(ph_words) - 1):
-        if (
-                    (ph_words[i][-1] in voicing_dict.keys() or ph_words[i][-2:] in voicing_dict.keys()) and
-                    (len(ph_words[i + 1]) == 1 and ph_words[i + 1] in voicing_dict.keys()) and
-                    ph_words[i + 2] and
-                    ph_words[i + 2][0] in voicing_dict.values()
-        ):
-            if ph_words[i][-2:] in voicing_dict.keys():
-                ph_words[i] = ph_words[i][:-2] + voicing_dict[ph_words[i][-2:]]
-                ph_words[i + 1] = voicing_dict[ph_words[i + 1]]
-            elif ph_words[i][-1] in voicing_dict.keys():
-                ph_words[i] = ph_words[i][:-1] + voicing_dict[ph_words[i][-1]]
-                ph_words[i + 1] = voicing_dict[ph_words[i + 1]]
-
-
-    # Voice assimilation for final obstruent clusters
-    for i in range(len(ph_words) - 1):
-        if len(ph_words[i]) > 3:
-            if ph_words[i][-2] in voi_dict_rev and ph_words[i][-1] in voicing_dict:
-                ph_words[i] = ph_words[i][:-2] + voi_dict_rev[ph_words[i][-2]] + ph_words[i][-1]
-            elif ph_words[i][-3:-1] in voi_dict_rev and ph_words[i][-1] in voicing_dict:
-                ph_words[i] = ph_words[i][:-3] + voi_dict_rev[ph_words[-3:-1]] + ph_words[i][-1]
-            elif ph_words[i][-4:-2] in voi_dict_rev and ph_words[i][-2:] in voicing_dict:
-                ph_words[i] = ph_words[i][:-4] + voi_dict_rev[ph_words[i][-4:-2]] + ph_words[i][-2:]
-            elif ph_words[i][-3] in voi_dict_rev and ph_words[i][-2:] in voicing_dict:
-                ph_words[i] = ph_words[i][:-3] + voi_dict_rev[ph_words[i][-3]] + ph_words[i][-2:]
-
-
-
-    # extract non-alphabetic substrings
-    non_words = re.findall(r'[^a-ząćęłńóśźż]+', text)
-
-
-    # put transcriptions of alphabetic substrings and non-alphabetic substrings back together
-    res = []
-    maxi = max([len(ph_words), len(non_words)])
-    if maxi == len(ph_words) and len(ph_words) != len(non_words):
-        for i in range(len(ph_words)-1):
-            res.append(ph_words[i])
-            res.append(non_words[i])
-        res.append(ph_words[-1])
-    elif len(ph_words) == len(non_words):
-        if text and text[0].isalpha():
-            for i in range(len(ph_words)):
-                res.append(ph_words[i])
-                res.append(non_words[i])
-        else:
-            for i in range(len(ph_words)):
-                res.append(non_words[i])
-                res.append(ph_words[i])
-    elif maxi == len(non_words) and len(ph_words) != len(non_words):
-        for i in range(len(non_words)-1):
-            res.append(non_words[i])
-            res.append(ph_words[i])
-        res.append(non_words[-1])
-
-    result = ''.join(res)
-
-    return result
-
-def transcribe_text_Warsaw(text):
-
-    # lowercase all letters
-    text = text.lower()
-
-    # extract alphabetic substrings
-    words = re.findall(r'[a-ząćęłńóśźż]+', text)
-
-    # phonemic transcription of words taken individually (regional processes not applied)
-    ph_words = []
-    if words:
-        for word in words:
-            ph_words.append(transcribe(word))
-
-
-    # pre-voiced-obstruent voicing
-    for i in range(len(ph_words) - 1):
-        if (
-                ph_words[i][-2:] in voi_dict_rev and
-                ph_words[i + 1][0] in voicing_dict
-        ):
-            ph_words[i] = (ph_words[i][:-2]) + (voi_dict_rev[(ph_words[i][-2:])])
-        elif (
-                (ph_words[i][-1]) in voi_dict_rev and
-                ph_words[i + 1][0] in voicing_dict
-        ):
-            ph_words[i] = (ph_words[i][:-1]) + (voi_dict_rev[(ph_words[i][-1])])
-
-    # extract non-alphabetic substrings
-    non_words = re.findall(r'[^a-ząćęłńóśźż]+', text)
-
-
-    # put transcriptions of alphabetic strings and non-alphabetic substrings back together
-    res = []
-    maxi = max([len(ph_words), len(non_words)])
-    if maxi == len(ph_words) and len(ph_words) != len(non_words):
-        for i in range(len(ph_words)-1):
-            res.append(ph_words[i])
-            res.append(non_words[i])
-        res.append(ph_words[-1])
-    elif len(ph_words) == len(non_words):
-        if text and text[0].isalpha():
-            for i in range(len(ph_words)):
-                res.append(ph_words[i])
-                res.append(non_words[i])
-        else:
-            for i in range(len(ph_words)):
-                res.append(non_words[i])
-                res.append(ph_words[i])
-    elif maxi == len(non_words) and len(ph_words) != len(non_words):
-        for i in range(len(non_words)-1):
-            res.append(non_words[i])
-            res.append(ph_words[i])
-        res.append(non_words[-1])
-
-    result = ''.join(res)
-
-    return result
-
-
-if __name__ == "__main__":
-    s = input("Wpisz tekst: ")
-    t = transcribe_text_Cracow(s)
-    print(t)

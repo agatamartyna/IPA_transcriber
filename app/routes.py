@@ -1,7 +1,9 @@
 from flask import render_template, request
 from app import app
 from app.forms import DialectForm
-from app.models import transcribe_text_Warsaw, transcribe_text_Cracow
+from app.models_Cracow import transcribe_text_Cracow
+from app.models_Warsaw import transcribe_text_Warsaw
+
 
 @app.route('/', methods=["GET", "POST"])
 def index():
