@@ -76,6 +76,7 @@ ipa_dict = {
     'o': MID_OPEN_BACK_ROUND,
     'ó': CLOSE_BACK_ROUND,
     'p': VS_BILAB_STOP,
+    'q': VS_VEL_STOP,
     'r': ALV_TRILL,
     's': VS_ALV_FRIC,
     'ś': VS_PAL_FRIC,
@@ -166,6 +167,18 @@ sibilants_dict = {
     VS_ALV_FRIC: VD_ALV_FRIC,
     VS_PAL_FRIC: VD_PAL_FRIC,
     VS_POSTALV_FRIC: VD_POSTALV_FRIC
+}
+
+# fricatives + affricates
+affric_dict = {
+    VS_ALV_AFF: VD_ALV_AFF,
+    VS_PAL_AFF: VD_PAL_AFF,
+    VS_POSTALV_AFF: VD_POSTALV_AFF,
+    VS_ALV_FRIC: VD_ALV_FRIC,
+    VS_PAL_FRIC: VD_PAL_FRIC,
+    VS_POSTALV_FRIC: VD_POSTALV_FRIC,
+    VS_VEL_FRIC: VD_VEL_FRIC,
+    VS_LABDENT_FRIC: VD_LABDENT_FRIC,
 }
 
 # palatals
@@ -312,14 +325,14 @@ def transcribe(word):
     # Regressive Voicing
     for i in range(len(ph_word) - 1):
         if (
-                ph_word[i] in sibilants_dict and
+                (ph_word[i] in affric_dict) and
                 ph_word[i + 1] in non_cont_obstr
         ):
-            if ph_word[i - 1:i + 1] in sibilants_dict:
-                vd_item = sibilants_dict[ph_word[i - 1:i + 1]]
+            if ph_word[i - 1:i + 1] in affric_dict:
+                vd_item = affric_dict[ph_word[i - 1:i + 1]]
                 ph_word = ph_word[:i - 1] + vd_item + ph_word[i + 1:]
-            elif ph_word[i] in sibilants_dict:
-                vd_item = sibilants_dict[ph_word[i]]
+            elif ph_word[i] in affric_dict:
+                vd_item = affric_dict[ph_word[i]]
                 ph_word = ph_word[:i] + vd_item + ph_word[i + 1:]
 
     # Progressive Devoicing
@@ -357,3 +370,8 @@ def transcribe(word):
 
     return ph_word
 
+
+
+
+if __name__ == "__main__":
+    print(transcribe(input("Wpisz: ")))
