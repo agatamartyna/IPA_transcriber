@@ -79,6 +79,16 @@ def transcribe_text_Warsaw(text):
             ph_words[i + 1] = voi_dict_rev[ph_words[i + 1]]
 
     # Regressive revoicing of 'w' and 'z' at the beginning f a phrase
+    for i in range(len(ph_words) - 1):
+        if (
+                len(ph_words[i]) == 1 and
+                ph_words[i] in voi_dict_rev and
+                i == 0 and
+                (ph_words[i + 1][0] in vocs or ph_words[i + 1][0] in ipa_vowels)
+        ):
+            ph_words[i] = voi_dict_rev[ph_words[i]]
+
+
 
 
     # extract non-alphabetic substrings

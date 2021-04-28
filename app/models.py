@@ -282,13 +282,14 @@ def transcribe(word):
                 ph_word = ph_word[:i + 1] + 'ɳ' + ph_word[i + 2:]
 
     #  notation: remove palatal approximant from sequences  PAL_APPROX + 'i' + VOWEL
-    for i in range(len(ph_word)-3):
+    for i in range(len(ph_word) - 3):
         if (
                 ph_word[i] in pals and
                 ph_word[i + 1] == 'i' and
                 ph_word[i + 2] in ipa_vowels
         ):
-            ph_word = ph_word[:i + 1] + ph_word[i + 2:]
+            ph_word = ph_word[:i + 1] + '&' + ph_word[i + 2:]
+    ph_word = ph_word.replace('&', '')
 
     #  notation: turn 'i' into 'j' in sequences CONSONANT + 'i' + VOWEL
     for i in range(len(ph_word)-3):
