@@ -131,7 +131,8 @@ non_cont_obstr = {
 }
 
 # continuant obstruents
-cont_obstr = ['w', 'f', 'z', 's', 'sz', 'ż', 'rz', 'ś', 'si', 'ź', 'zi', 'h', 'ch']
+cont_obstr = ['w', 'f', 'z', 's', 'sz', 'ż', 'rz',
+              'ś', 'si', 'ź', 'zi', 'h', 'ch']
 
 # simplify clusters
 clusters_dict = {
@@ -148,7 +149,8 @@ clusters_dict = {
     VD_DENT_STOP + VD_PAL_FRIC: VD_PAL_AFF
 }
 
-# palatalised sounds with multiple character notation in pairs one-to-one transcription - sound
+# palatalised sounds with multiple character notation
+# in pairs one-to-one transcription - sound
 soft_clusters_dict = {
     VS_ALV_AFF + CLOSE_FRONT: VS_PAL_AFF + CLOSE_FRONT,
     VS_ALV_FRIC + CLOSE_FRONT: VS_PAL_FRIC + CLOSE_FRONT,
@@ -189,12 +191,18 @@ pals = [
 ]
 
 # non-palatals
-non_pals = [VS_BILAB_STOP, VD_BILAB_STOP, VS_DENT_STOP, VD_DENT_STOP, VS_LABDENT_FRIC, VD_LABDENT_FRIC,
-            '\u0261', 'x', 'k', 'l', 'm', 'r',]
+non_pals = [
+    VS_BILAB_STOP, VD_BILAB_STOP, VS_DENT_STOP,
+    VD_DENT_STOP, VS_LABDENT_FRIC, VD_LABDENT_FRIC,
+    '\u0261', 'x', 'k', 'l', 'm', 'r'
+]
 
 
 # vocalics
-vocs = [PAL_APPROX, BILAB_APPROX, ALV_LAT_APPROX, ALV_TRILL, DENT_NAS, BILAB_NAS, PAL_NAS]
+vocs = [
+    PAL_APPROX, BILAB_APPROX, ALV_LAT_APPROX,
+    ALV_TRILL, DENT_NAS, BILAB_NAS, PAL_NAS
+]
 
 
 def transcribe(word):
@@ -276,10 +284,12 @@ def transcribe(word):
                 ph_word = ph_word[:i + 1] + 'ŋ' + ph_word[i + 2:]
             elif ph_word[i + 2:i + 4] in [VS_PAL_AFF, VD_PAL_AFF]:
                 ph_word = ph_word[:i + 1] + 'ɲ' + ph_word[i + 2:]
-            elif ph_word[i + 2:i + 4] in [VS_ALV_AFF, VD_ALV_AFF, VS_POSTALV_AFF, VD_POSTALV_AFF]:
+            elif ph_word[i + 2:i + 4] in \
+                    [VS_ALV_AFF, VD_ALV_AFF, VS_POSTALV_AFF, VD_POSTALV_AFF]:
                 ph_word = ph_word[:i + 1] + 'ɳ' + ph_word[i + 2:]
 
-    #  notation: remove palatal approximant from sequences  PAL_APPROX + 'i' + VOWEL
+    #  notation: remove palatal approximant
+    #  from sequences  PAL_APPROX + 'i' + VOWEL
     for i in range(len(ph_word) - 2):
         if (
                 ph_word[i] in pals and
@@ -306,20 +316,24 @@ def transcribe(word):
             ph_word = ph_word[:-1] + voicing_dict[voiced]
 
     # Final Devoicing for Pairs of Obstruent Clusters
-    # this empirically-based solution not working with final obstruent clusters longer than 2 items
+    # this empirically-based solution not working with
+    # final obstruent clusters longer than 2 items
     # because there are none in Polish
     for i in range(len(ph_word) - 1):
         if ph_word[-2:] in voi_dict_rev:
             if len(ph_word) >= 4 and ph_word[-4:-2] in voicing_dict:
-                ph_word = ph_word[:-4] + voicing_dict[ph_word[-4:-2]] + ph_word[-2:]
-            elif len(ph_word) >=3 and ph_word[-3] in voicing_dict:
-                ph_word = ph_word[:-3] + voicing_dict[ph_word[-3]] + ph_word[-2:]
-        elif  ph_word[-1] in voi_dict_rev:
+                ph_word = ph_word[:-4] + \
+                          voicing_dict[ph_word[-4:-2]] + ph_word[-2:]
+            elif len(ph_word) >= 3 and ph_word[-3] in voicing_dict:
+                ph_word = ph_word[:-3] + \
+                          voicing_dict[ph_word[-3]] + ph_word[-2:]
+        elif ph_word[-1] in voi_dict_rev:
             if len(ph_word) >= 3 and ph_word[-3:-1] in voicing_dict:
-                ph_word = ph_word[:-3] + voicing_dict[ph_word[-3:-1]] + ph_word[-1]
-            elif len(ph_word) >=2 and ph_word[-2] in voicing_dict:
-                ph_word = ph_word[:-2] + voicing_dict[ph_word[-2]] + ph_word[-1]
-
+                ph_word = ph_word[:-3] + \
+                          voicing_dict[ph_word[-3:-1]] + ph_word[-1]
+            elif len(ph_word) >= 2 and ph_word[-2] in voicing_dict:
+                ph_word = ph_word[:-2] + \
+                          voicing_dict[ph_word[-2]] + ph_word[-1]
 
     # Regressive Voicing
     for i in range(len(ph_word) - 1):
@@ -361,12 +375,11 @@ def transcribe(word):
     i = 0
     while i < len(ph_word)-1:
         if (
-                ph_word[i] in ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 'l', 'r', 'm'] and
+                ph_word[i] in
+                ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 'l', 'r', 'm'] and
                 ph_word[i + 1] == 'i'
         ):
             ph_word = ph_word[:i + 1] + PAL + ph_word[i + 1:]
         i = i + 1
 
     return ph_word
-
-
